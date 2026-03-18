@@ -10,6 +10,8 @@
 <body>
   <header>
     <h1>Elveriket</h1>
+
+    <!-- Viser hvem sin tur det er, penger og timer -->
     <div id="turn-box">
       <span id="turn-player"></span>
     </div>
@@ -17,8 +19,10 @@
 
   <main>
     <section id="map-section">
+      <!-- Kartet ditt -->
       <img id="map-img" src="map.png" alt="Kart" />
 
+      <!-- Klikkbare territorier -->
       <div id="territory-overlay">
         <button class="territory" data-id="nordflod" style="top:12%; left:30%;">Nordflod</button>
         <button class="territory" data-id="vestlund" style="top:40%; left:20%;">Vestlund</button>
@@ -37,8 +41,8 @@
 
       <h2>Handlinger</h2>
       <div id="actions">
-        <button id="fortify-btn" disabled>Forsterk (+5 tropper)</button>
-        <button id="attack-btn" disabled>Angrip (-10 fiendetropper)</button>
+        <button id="fortify-btn" disabled>Forsterk (+5 tropper) – 10💰</button>
+        <button id="attack-btn" disabled>Angrip (20 dmg)</button>
         <button id="end-turn-btn">Avslutt tur</button>
       </div>
     </section>
