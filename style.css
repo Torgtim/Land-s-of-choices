@@ -1,0 +1,62 @@
+body {
+  margin: 0;
+  background: #111;
+  color: #eee;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  padding: 10px;
+  text-align: center;
+  background: #222;
+}
+
+#turn-box {
+  margin-top: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+#map-section {
+  position: relative;
+}
+
+#map-img {
+  width: 100%;
+  display: block;
+}
+
+#territory-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.territory {
+  position: absolute;
+  pointer-events: auto;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+}
+
+#panel {
+  padding: 10px;
+  background: #1a1a1a;
+}
+
+button {
+  background: #333;
+  color: #eee;
+  border: 1px solid #555;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin: 4px;
+}
+
+button:disabled {
+  opacity: 0.4;
+}
