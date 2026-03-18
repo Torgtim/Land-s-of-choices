@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elveriket – 2 Player Hotseat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header>
+    <h1>Elveriket</h1>
+    <div id="turn-box">
+      <span id="turn-player"></span>
+    </div>
+  </header>
+
+  <main>
+    <section id="map-section">
+      <img id="map-img" src="map.png" alt="Kart" />
+
+      <div id="territory-overlay">
+        <button class="territory" data-id="nordflod" style="top:12%; left:30%;">Nordflod</button>
+        <button class="territory" data-id="vestlund" style="top:40%; left:20%;">Vestlund</button>
+        <button class="territory" data-id="midtriket" style="top:35%; left:50%;">Midtriket</button>
+        <button class="territory" data-id="ostheim" style="top:20%; left:70%;">Østheim</button>
+        <button class="territory" data-id="sorskogen" style="top:60%; left:30%;">Sørskogen</button>
+        <button class="territory" data-id="dypmyr" style="top:60%; left:55%;">Dypmyr</button>
+        <button class="territory" data-id="kilemark" style="top:75%; left:45%;">Kilemark</button>
+        <button class="territory" data-id="sandhavn" style="top:85%; left:50%;">Sandhavn</button>
+      </div>
+    </section>
+
+    <section id="panel">
+      <h2>Landinfo</h2>
+      <div id="territory-info">Velg et land</div>
+
+      <h2>Handlinger</h2>
+      <div id="actions">
+        <button id="fortify-btn" disabled>Forsterk (+5 tropper)</button>
+        <button id="attack-btn" disabled>Angrip (-10 fiendetropper)</button>
+        <button id="end-turn-btn">Avslutt tur</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
