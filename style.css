@@ -66,3 +66,22 @@ button:disabled {
   width: 100%;
   margin-top: 5px;
 }
+
+#shop button {
+  width: 100%;
+  margin-top: 4px;
+}
+
+#log {
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 0.8rem;
+  background: #111;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #333;
+}
+
+#log p {
+  margin: 2px 0;
+}
