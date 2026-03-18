@@ -1,5 +1,5 @@
 // =======================================
-//   ELVERIKET – GAME ENGINE (DEL 1)
+//   ELVERIKET – GAME ENGINE
 // =======================================
 
 // -------------------------------
@@ -17,18 +17,18 @@ let state = {
   },
 
   territories: {
-    nordflod: { name: "Nordflod", owner: "player1", troops: 140, tanks: 12, fly: 4 },
-    vestlund: { name: "Vestlund", owner: "player2", troops: 90, tanks: 3, fly: 0 },
-    midtriket: { name: "Midtriket", owner: "player1", troops: 200, tanks: 20, fly: 10 },
-    ostheim: { name: "Østheim", owner: "player2", troops: 120, tanks: 5, fly: 2 },
-    sorskogen: { name: "Sørskogen", owner: "player1", troops: 110, tanks: 4, fly: 1 },
-    dypmyr: { name: "Dypmyr", owner: "player2", troops: 80, tanks: 2, fly: 0 },
-    kilemark: { name: "Kilemark", owner: "player1", troops: 150, tanks: 6, fly: 2 },
-    sandhavn: { name: "Sandhavn", owner: "player2", troops: 100, tanks: 8, fly: 6 }
+    nordflod: { name: "Nordflod", owner: "player1", troops: 140, tanks: 12, fly: 4, defenseBonus: 0.2 },
+    vestlund: { name: "Vestlund", owner: "player2", troops: 90, tanks: 3, fly: 0, defenseBonus: 0.3 },
+    midtriket: { name: "Midtriket", owner: "player1", troops: 200, tanks: 20, fly: 10, defenseBonus: 0.1 },
+    ostheim: { name: "Østheim", owner: "player2", troops: 120, tanks: 5, fly: 2, defenseBonus: 0.2 },
+    sorskogen: { name: "Sørskogen", owner: "player1", troops: 110, tanks: 4, fly: 1, defenseBonus: 0.15 },
+    dypmyr: { name: "Dypmyr", owner: "player2", troops: 80, tanks: 2, fly: 0, defenseBonus: 0.25 },
+    kilemark: { name: "Kilemark", owner: "player1", troops: 150, tanks: 6, fly: 2, defenseBonus: 0.1 },
+    sandhavn: { name: "Sandhavn", owner: "player2", troops: 100, tanks: 8, fly: 6, defenseBonus: 0.05 }
   },
 
   selected: null,
-  pendingAttack: null // lagrer angrepsvalg før counter
+  pendingAttack: null
 };
 
 // -------------------------------
@@ -52,8 +52,23 @@ const ctrTroops = document.getElementById("ctr-troops");
 const ctrTanks = document.getElementById("ctr-tanks");
 const ctrFly = document.getElementById("ctr-fly");
 
+const logBox = document.getElementById("log");
+const buyTroopsBtn = document.getElementById("buy-troops");
+const buyTanksBtn = document.getElementById("buy-tanks");
+const buyFlyBtn = document.getElementById("buy-fly");
+
 // -------------------------------
-//   RENDER FUNKSJON
+//   LOGG
+// -------------------------------
+
+function addLog(message) {
+  const p = document.createElement("p");
+  p.textContent = message;
+  logBox.prepend(p);
+}
+
+// -------------------------------
+//   RENDER
 // -------------------------------
 
 function render() {
@@ -82,10 +97,8 @@ function render() {
 
   const isOwner = t.owner === state.turn;
 
-  // Forsterk kun egne land
   fortifyBtn.disabled = !isOwner || state.players[state.turn].money < 10;
 
-  // Angrep kun fiendens land
   if (!isOwner) {
     attackOptions.style.display = "block";
   }
@@ -103,10 +116,6 @@ document.querySelectorAll(".territory").forEach(btn => {
   });
 });
 
-// =======================================
-//   ELVERIKET – GAME ENGINE (DEL 2)
-// =======================================
-
 // -------------------------------
 //   ENHETSVERDIER
 // -------------------------------
@@ -120,16 +129,6 @@ const unitStats = {
 // -------------------------------
 //   COUNTER-LOGIKK
 // -------------------------------
-//
-// Tanks counter fly
-// Fly counter troops
-// Troops counter tanks
-//
-// Returnerer:
-//   "counter" → forsvarer vinner
-//   "attacker" → angriper vinner
-//   "equal" → samme type
-//
 
 function counterResult(attacker, defender) {
   if (attacker === defender) return "equal";
@@ -153,29 +152,24 @@ function startAttack(unitType) {
   const attacker = state.players[state.turn];
   const t = state.territories[state.selected];
 
-  // Sjekk om angriper har enheten
   if (t[unitType] <= 0) {
     alert("Du har ikke nok enheter av denne typen!");
     return;
   }
 
-  // Sjekk penger
   if (attacker.money < unitStats[unitType].cost) {
     alert("Du har ikke nok penger!");
     return;
   }
 
-  // Trekk penger
   attacker.money -= unitStats[unitType].cost;
 
-  // Lagre angrepet
   state.pendingAttack = {
     attackerUnit: unitType,
     target: state.selected,
     attackerPlayer: state.turn
   };
 
-  // Vis counter-knapper
   attackOptions.style.display = "none";
   counterOptions.style.display = "block";
 
@@ -188,55 +182,58 @@ function startAttack(unitType) {
 
 function resolveCounter(defenderUnit) {
   const atk = state.pendingAttack;
+  if (!atk) return;
+
   const attacker = state.players[atk.attackerPlayer];
-  const defenderPlayer = state.players[state.territories[atk.target].owner];
   const territory = state.territories[atk.target];
+  const defenderPlayer = state.players[territory.owner];
 
   const result = counterResult(atk.attackerUnit, defenderUnit);
 
   let damage = unitStats[atk.attackerUnit].damage;
 
   if (result === "counter") {
-    // Forsvarer vinner → angriper gjør 0 skade
     damage = 0;
+    addLog(`${defenderPlayer.name} vant counteren med ${defenderUnit}. Ingen skade.`);
     alert("Forsvareren vant counteren! Ingen skade gjort.");
   }
 
   if (result === "attacker") {
-    // Angriper vinner → bonus skade
     damage += 5;
+    addLog(`${attacker.name} vant counteren med ${atk.attackerUnit}. Bonus skade!`);
     alert("Angriperen vant counteren! Bonus skade!");
   }
 
   if (result === "equal") {
+    addLog(`Samme enhetstype i kamp: normal skade.`);
     alert("Samme enhetstype! Normal skade.");
   }
 
-  // Påfør skade
+  let rawDamage = damage;
+  const defenseBonus = territory.defenseBonus || 0;
+  damage = Math.round(damage * (1 - defenseBonus));
+
   territory.troops = Math.max(0, territory.troops - damage);
 
-  // Belønning hvis angriper gjorde skade
+  addLog(`${attacker.name} angriper ${territory.name} med ${atk.attackerUnit} (${rawDamage} → ${damage} dmg).`);
+
   if (damage > 0) {
     attacker.money += 10;
+    addLog(`${attacker.name} tjente 10💰 for vellykket angrep.`);
   }
 
-  // Erobring
   if (territory.troops === 0) {
     territory.owner = atk.attackerPlayer;
-    territory.troops = 30; // starttropp
+    territory.troops = 30;
+    addLog(`${territory.name} ble erobret av ${attacker.name}!`);
     alert(`${territory.name} ble erobret!`);
   }
 
-  // Reset
   state.pendingAttack = null;
   counterOptions.style.display = "none";
 
   render();
 }
-
-// =======================================
-//   ELVERIKET – GAME ENGINE (DEL 3)
-// =======================================
 
 // -------------------------------
 //   FORSTERKING
@@ -254,8 +251,54 @@ fortifyBtn.addEventListener("click", () => {
   t.troops += 5;
   p.money -= 10;
 
+  addLog(`${p.name} forsterket ${t.name} med +5 tropper.`);
   render();
 });
+
+// -------------------------------
+//   BUTIKK
+// -------------------------------
+
+function buyUnit(type) {
+  const p = state.players[state.turn];
+  const selectedId = state.selected;
+  if (!selectedId) {
+    alert("Velg et land du eier først!");
+    return;
+  }
+  const t = state.territories[selectedId];
+  if (t.owner !== state.turn) {
+    alert("Du kan bare kjøpe enheter til egne land!");
+    return;
+  }
+
+  if (type === "troops") {
+    if (p.money < 10) return alert("Ikke nok penger!");
+    p.money -= 10;
+    t.troops += 10;
+    addLog(`${p.name} kjøpte 10 tropper til ${t.name}.`);
+  }
+
+  if (type === "tanks") {
+    if (p.money < 25) return alert("Ikke nok penger!");
+    p.money -= 25;
+    t.tanks += 1;
+    addLog(`${p.name} kjøpte 1 tank til ${t.name}.`);
+  }
+
+  if (type === "fly") {
+    if (p.money < 40) return alert("Ikke nok penger!");
+    p.money -= 40;
+    t.fly += 1;
+    addLog(`${p.name} kjøpte 1 fly til ${t.name}.`);
+  }
+
+  render();
+}
+
+buyTroopsBtn.addEventListener("click", () => buyUnit("troops"));
+buyTanksBtn.addEventListener("click", () => buyUnit("tanks"));
+buyFlyBtn.addEventListener("click", () => buyUnit("fly"));
 
 // -------------------------------
 //   ANGRIP-KNAPPER
